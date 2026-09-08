@@ -191,10 +191,10 @@
                 <name and="text" delimiter=", "/>
               </names>
             </if>
-            <else-if match="any" variable="editor"/>
+            <else-if variable="editor"/>
           </choose>
           <choose>
-            <if variable="author editor" match="any">
+            <if variable="author editor">
               <names variable="translator" delimiter=". " suffix=".">
                 <label form="verb" text-case="capitalize-first" suffix=" "/>
                 <name delimiter="," and="text"/>
@@ -209,7 +209,7 @@
        encyclopedia/dictionary entry - MDC 1.2.1.3 Book Chapters, 1.2.1.4 Encyclopedia Entries. -->
   <macro name="container-contributors">
     <choose>
-      <if type="chapter paper-conference entry-encyclopedia entry-dictionary" match="any">
+      <if type="chapter paper-conference entry-encyclopedia entry-dictionary">
         <group delimiter=", ">
           <choose>
             <if variable="author">
@@ -220,7 +220,7 @@
             </if>
           </choose>
           <choose>
-            <if variable="author editor" match="any">
+            <if variable="author editor">
               <names variable="translator" delimiter=", ">
                 <label form="verb" suffix=" "/>
                 <name and="text" delimiter=", "/>
@@ -246,7 +246,7 @@
           </if>
         </choose>
       </if>
-      <else-if type="bill book graphic legal_case legislation motion_picture report" match="any">
+      <else-if type="bill book graphic legal_case legislation motion_picture report">
         <group font-style="italic">
           <text variable="title" text-case="title" suffix="."/>
         </group>
@@ -273,7 +273,7 @@
           <if type="interview">
             <text term="interview" text-case="lowercase"/>
           </if>
-          <else-if type="manuscript speech" match="any">
+          <else-if type="manuscript speech">
             <text variable="genre" form="short"/>
           </else-if>
           <else-if type="personal_communication">
@@ -281,8 +281,7 @@
           </else-if>
         </choose>
       </if>
-      <else-if type="bill book graphic legal_case legislation motion_picture report song"
-        match="any">
+      <else-if type="bill book graphic legal_case legislation motion_picture report song">
         <text variable="title" form="short" text-case="title" font-style="italic"/>
       </else-if>
       <else-if variable="reviewed-author">
@@ -299,33 +298,38 @@
   <!-- Bibliography "genre" line (e.g. "Unpublished lecture", "Class handout") and interviewer
        credit - MDC 1.2.1.7 Unpublished Lectures, 1.2.1.11 Handouts, 1.2.1.20 Interviews. -->
   <macro name="description">
-    <group delimiter=", ">
-      <group delimiter=". ">
-        <text macro="interviewer"/>
-        <text variable="medium" text-case="capitalize-first"/>
-      </group>
-      <choose>
-        <if variable="title" match="none"/>
-        <else-if type="thesis speech webpage post-weblog" match="any"/>
-        <else>
-          <text variable="genre" text-case="capitalize-first"/>
-        </else>
-      </choose>
-    </group>
+    <choose>
+      <if
+        type="book chapter article-journal article-magazine article-newspaper entry-dictionary entry-encyclopedia"/>
+      <else>
+        <group delimiter=", ">
+          <group delimiter=". ">
+            <text macro="interviewer"/>
+            <text variable="medium" text-case="capitalize-first"/>
+          </group>
+          <choose>
+            <if variable="title" match="none"/>
+            <else-if type="thesis speech webpage post-weblog"/>
+            <else>
+              <text variable="genre" text-case="capitalize-first"/>
+            </else>
+          </choose>
+        </group>
+      </else>
+    </choose>
   </macro>
   <!-- "In Container-Title" for chapters/dictionary & encyclopedia entries (MDC 1.2.1.3, 1.2.1.4);
        abbreviated (short-form) journal/magazine/reference-work titles - MDC 1.2.6. -->
   <macro name="container-title">
     <choose>
-      <if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
+      <if type="chapter paper-conference entry-dictionary entry-encyclopedia">
         <text term="in" text-case="capitalize-first" suffix=" "/>
       </if>
     </choose>
     <choose>
       <if type="legal_case" match="none">
         <choose>
-          <if type="article-journal article-magazine entry-dictionary entry-encyclopedia"
-            match="any">
+          <if type="article-journal article-magazine entry-dictionary entry-encyclopedia">
             <text variable="container-title" form="short" font-style="italic"/>
           </if>
           <else>
@@ -353,8 +357,7 @@
   <macro name="edition">
     <choose>
       <if
-        type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song"
-        match="any">
+        type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song">
         <choose>
           <if is-numeric="edition">
             <group delimiter=" ">
@@ -373,10 +376,10 @@
        (journal volume.issue), 1.2.1.1.10-12 (multi-volume works), 1.2.1.3 (chapter volume). -->
   <macro name="locators">
     <choose>
-      <if type="entry-dictionary entry-encyclopedia" match="any">
+      <if type="entry-dictionary entry-encyclopedia">
         <text variable="volume" strip-periods="false" prefix=", "/>
       </if>
-      <else-if type="article-journal" match="any">
+      <else-if type="article-journal">
         <text variable="volume" strip-periods="false" prefix=" "/>
         <text variable="issue" strip-periods="false" prefix="."/>
       </else-if>
@@ -385,8 +388,7 @@
         <text variable="container-title" prefix=" "/>
         <text variable="page" prefix=" "/>
       </else-if>
-      <else-if type="bill book graphic legal_case legislation motion_picture report song"
-        match="any">
+      <else-if type="bill book graphic legal_case legislation motion_picture report song">
         <group prefix=" " delimiter=". ">
           <group>
             <number variable="number-of-volumes" form="numeric"/>
@@ -395,7 +397,7 @@
           <text macro="edition"/>
         </group>
       </else-if>
-      <else-if type="chapter paper-conference" match="any">
+      <else-if type="chapter paper-conference">
         <group prefix=". " delimiter=". ">
           <choose>
             <if variable="page" match="none">
@@ -430,7 +432,7 @@
   <!-- Bibliography "volume:page." for book chapters - MDC 1.2.1.3.2. -->
   <macro name="locators-chapter">
     <choose>
-      <if type="chapter paper-conference" match="any">
+      <if type="chapter paper-conference">
         <choose>
           <if variable="page">
             <text variable="volume" suffix=":"/>
@@ -440,18 +442,14 @@
       </if>
     </choose>
   </macro>
-  <!-- Bibliography journal page range, or "No pages." for online-only articles without
-       print pagination - MDC 1.2.1.2.4 Online-Only Articles. -->
+  <!-- Bibliography journal page range. -->
   <macro name="locators-journal">
     <choose>
-      <if type="article-journal" match="any">
+      <if type="article-journal">
         <choose>
-          <if match="any" variable="page">
+          <if variable="page">
             <text variable="page" prefix=" "/>
           </if>
-          <else>
-            <text value="No pages" prefix=". "/>
-          </else>
         </choose>
       </if>
     </choose>
@@ -459,9 +457,9 @@
   <!-- Bibliography "volume:page." for dictionary/encyclopedia entries - MDC 1.2.1.4. -->
   <macro name="locators-entry">
     <choose>
-      <if type="entry-dictionary entry-encyclopedia" match="any">
+      <if type="entry-dictionary entry-encyclopedia">
         <choose>
-          <if variable="volume" match="any">
+          <if variable="volume">
             <text variable="page" prefix=":" suffix="."/>
           </if>
           <else>
@@ -478,8 +476,7 @@
       <choose>
         <if locator="page" match="none">
           <choose>
-            <if type="bill book graphic legal_case legislation motion_picture report song"
-              match="any">
+            <if type="bill book graphic legal_case legislation motion_picture report song">
               <choose>
                 <if variable="volume"/>
                 <else>
@@ -489,8 +486,7 @@
             </if>
           </choose>
         </if>
-        <else-if type="bill book graphic legal_case legislation motion_picture report song"
-          match="any">
+        <else-if type="bill book graphic legal_case legislation motion_picture report song">
           <number variable="volume" form="numeric" suffix=":"/>
         </else-if>
       </choose>
@@ -520,7 +516,7 @@
     <choose>
       <if variable="issued">
         <choose>
-          <if type="graphic report" match="any">
+          <if type="graphic report">
             <date date-parts="year" form="text" variable="issued"/>
           </if>
           <else-if type="legal_case">
@@ -528,25 +524,17 @@
             <date date-parts="year" form="text" variable="issued"/>
           </else-if>
           <else-if
-            type="bill book chapter graphic legal_case legislation motion_picture report song thesis"
-            match="any">
+            type="bill book chapter graphic legal_case legislation motion_picture report song thesis">
             <date variable="issued" delimiter="–">
               <date-part name="year"/>
               <date-part name="month"/>
             </date>
           </else-if>
-          <else-if type="paper-conference" match="any">
+          <else-if type="paper-conference">
             <date date-parts="year-month-day" form="text" variable="issued"/>
           </else-if>
-          <else-if type="article-journal" match="any">
-            <choose>
-              <if match="any" variable="DOI URL">
-                <date date-parts="year" form="text" variable="issued"/>
-              </if>
-              <else>
-                <date date-parts="year" form="text" variable="issued"/>
-              </else>
-            </choose>
+          <else-if type="article-journal">
+            <date date-parts="year" form="text" variable="issued"/>
           </else-if>
           <else>
             <date form="text" variable="issued"/>
@@ -559,11 +547,11 @@
     </choose>
   </macro>
   <!-- The publication-details group after the title: "(Year)" for journals/legal cases;
-       "Genre, Institution, Year" for theses (MDC 1.2.1.6); "(City: Publisher, Year)" for
+       "Genre, Institution, Year" for theses (MDC 1.2.1.6); "City: Publisher, Year" for
        most other types; date-only for newspapers (MDC 1.2.1.24). -->
   <macro name="issue">
     <choose>
-      <if type="article-journal legal_case" match="any">
+      <if type="article-journal legal_case">
         <text macro="issued" prefix=" (" suffix=")"/>
       </if>
       <else-if type="speech">
@@ -577,7 +565,7 @@
         <text variable="event-place" prefix=", "/>
         <text macro="issued" prefix=", "/>
       </else-if>
-      <else-if variable="publisher-place publisher" match="any">
+      <else-if variable="publisher-place publisher">
         <group delimiter=", " prefix=" ">
           <choose>
             <if type="thesis">
@@ -585,19 +573,17 @@
               <text variable="publisher"/>
               <text macro="issued"/>
             </if>
-          </choose>
-          <choose>
-            <if type="thesis" match="none">
+            <else>
               <text macro="publisher"/>
               <text macro="issued"/>
-            </if>
+            </else>
           </choose>
         </group>
       </else-if>
-      <else-if type="article-newspaper" match="any">
+      <else-if type="article-newspaper">
         <date form="text" variable="issued" prefix=", "/>
       </else-if>
-      <else-if type="thesis" match="any">
+      <else-if type="thesis">
         <text variable="genre"/>
       </else-if>
       <else>
@@ -616,90 +602,85 @@
       <text variable="archive-place"/>
     </group>
   </macro>
+  <!-- ==========================================================================
+       PAGINATION CHECK
+       ========================================================================== -->
+  <!-- "No pages" for subsections within online-only resources that lack print pagination - e.g. MDC 1.2.1.2.4 Online-Only Articles -->
+  <macro name="pagination">
+    <choose>
+      <if type="article-journal entry-dictionary entry-encyclopedia webpage post-weblog">
+        <choose>
+          <if variable="page" match="none">
+            <text value="No pages" prefix=". "/>
+          </if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
   <!-- DOI/URL handling at the end of a bibliography entry:
-       - webpages/blogs get "No pages. Online: URL" (MDC 1.2.1.14)
-       - online-only dictionary/encyclopedia entries with no print page get the same
-         (MDC 1.2.1.5); entries that do have a page just get a plain URL
-       - journal articles: DOI only if present, never DOI and URL together (MDC 1.2.1.2.3-4)
+       - no DOI or URL for books, book chapters, theses, or presentations (requires manual fix for online-only resources of these types)
+       - webpages/blogs get "Online: URL" (MDC 1.2.1.14)
+       - online-only dictionary/encyclopedia entries with no print page get the same (MDC 1.2.1.5)
+       - journal articles: DOI only if unpaginated (suggestion online-only); never DOI and URL together (MDC 1.2.1.2.3-4)
        - everything else (books, chapters, etc.): DOI if present, else a plain URL -->
   <macro name="access">
     <group>
+      <text macro="archive"/>
       <choose>
-        <if type="graphic report" match="any">
-          <text macro="archive"/>
-        </if>
-        <else-if
-          type="article-journal article-magazine article-newspaper bill book chapter graphic legal_case legislation motion_picture paper-conference report song thesis entry-encyclopedia entry-dictionary"
-          match="none">
-          <text macro="archive"/>
-        </else-if>
-      </choose>
-      <choose>
-        <if type="legal_case" match="none">
+        <!-- Webpages/blogs: MDC 1.2.1.14 requires "Online: URL" -->
+        <if type="webpage post-weblog">
           <choose>
-            <!-- Webpages/blogs: MDC 1.2.1.14 requires "No pages. Online: URL" -->
-            <if type="webpage post-weblog" match="any">
-              <choose>
-                <if variable="URL">
-                  <text value="No pages. Online: " prefix=". "/>
-                  <text variable="URL"/>
-                </if>
-              </choose>
+            <if variable="URL">
+              <text variable="URL" prefix=". Online: "/>
             </if>
-            <!-- Dictionary/encyclopedia entries with no print page (online-only): MDC 1.2.1.5 -->
-            <else-if type="entry-dictionary entry-encyclopedia" match="any">
-              <choose>
-                <if variable="page" match="none">
-                  <choose>
-                    <if variable="URL">
-                      <text value="No pages. Online: " prefix=". "/>
-                      <text variable="URL"/>
-                    </if>
-                  </choose>
-                </if>
-                <else-if variable="URL">
-                  <text variable="URL" prefix=". "/>
-                </else-if>
-              </choose>
-            </else-if>
-            <!-- Journal articles: MDC 1.2.1.2.3-4 - if a DOI exists, cite the DOI only, never both DOI and URL -->
-            <else-if type="article-journal">
-              <choose>
-                <if variable="DOI">
-                  <text variable="DOI" prefix=". DOI: "/>
-                </if>
-                <else-if variable="URL">
-                  <text variable="URL" prefix=". Online: "/>
-                </else-if>
-              </choose>
-            </else-if>
-            <else-if type="book chapter" match="any">
-              <choose>
-                <if variable="DOI">
-                  <text variable="DOI" prefix=". DOI: "/>
-                </if>
-                <else-if variable="URL">
-                  <text variable="URL" prefix=". "/>
-                </else-if>
-              </choose>
-            </else-if>
-            <else>
-              <choose>
-                <if variable="DOI">
-                  <text variable="DOI" prefix=". DOI: "/>
-                </if>
-                <else-if variable="URL">
-                  <text variable="URL" prefix=", "/>
-                </else-if>
-              </choose>
-            </else>
           </choose>
         </if>
-        <else>
-          <text variable="URL" prefix=", "/>
-        </else>
+        <!-- Books, chapters in books, theses, presentations - never include DOI or URL (requires manual fix for online-only books and book chapters; MDC never wants online info for theses) -->
+        <else-if type="book chapter thesis speech"/>
+        <!-- Dictionary/encyclopedia entries with no print page (online-only): MDC 1.2.1.5 -->
+        <else-if type="entry-dictionary entry-encyclopedia">
+          <choose>
+            <if variable="page"/>
+            <else-if variable="DOI">
+              <text variable="DOI" prefix=". DOI: "/>
+            </else-if>
+            <else-if variable="URL">
+              <text variable="URL" prefix=". Online: "/>
+            </else-if>
+          </choose>
+        </else-if>
+        <!-- Journal articles: MDC 1.2.1.2.3-4 - if paginated, exclude DOI and URL even if they exist (requires manual fix for paginated online-only periodicals); otherwise, if a DOI exists, cite the DOI only, never both DOI and URL -->
+        <else-if type="article-journal">
+          <choose>
+            <if variable="page"/>
+            <else-if variable="DOI">
+              <text variable="DOI" prefix=". DOI: "/>
+            </else-if>
+            <else-if variable="URL">
+              <text variable="URL" prefix=". Online: "/>
+            </else-if>
+          </choose>
+        </else-if>
+        <!-- Fallback - for all remaining resources, include a DOI if possible, otherwise fall back to URL -->
+        <else-if variable="DOI">
+          <text variable="DOI" prefix=". DOI: "/>
+        </else-if>
+        <else-if variable="URL">
+          <text variable="URL" prefix=". Online: "/>
+        </else-if>
       </choose>
     </group>
+  </macro>
+  <!-- ==========================================================================
+       ELECTRONIC FORMATS
+       ========================================================================== -->
+  <!-- Kindle editions: MDC 1.2.1.13 requires "Kindle edition." -->
+  <macro name="electronic-format">
+    <choose>
+      <if type="book chapter entry-encyclopedia" variable="medium">
+        <text text-case="capitalize-first" variable="medium" prefix=". "/>
+      </if>
+    </choose>
   </macro>
   <!-- ==========================================================================
        CITATION (FOOTNOTES)
@@ -758,7 +739,9 @@
         <text macro="issue"/>
         <text macro="locators-newspaper" prefix=", "/>
         <text macro="locators-journal"/>
+        <text macro="pagination"/>
         <text macro="access"/>
+        <text macro="electronic-format"/>
       </group>
     </layout>
   </bibliography>
