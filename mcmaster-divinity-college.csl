@@ -19,17 +19,13 @@
     * Bibliography entries list every author/editor/translator; footnotes truncate
       to "et al." after 3+ names. This split (MDC's Version 1.2 update #4) is why
       several name macros come in two variants: a truncated one used only as a sort
-      key, and an untruncated "full" one used for the actual bibliography text.
-    * Macros are grouped below by function (Names, Titles, Container/Series,
-      Locators and Dates, Publication Details, Archives/DOI/URL), independent of
-      the order they're called in citation/bibliography. Every macro defined here
-      is called from one or both of those; there is no dead/unused code.
-    * Two MDC conventions are not implemented, because CSL's data model can't
-      express them without a workaround on the Zotero-library side: 1) the
-      abbreviated two-tier reference-work format for ABD/BDAG/TDNT-style sources
-      (MDC 1.2.1.4), and 2) the four-tier bibliography ordering for an author's
-      repeated entries: sole-authored, then multi-authored, then sole-edited,
-      then multi-edited (MDC 1.2.3).
+      key, and an untruncated "full" one used for the actual bibliography text.    
+    * The bibliography's sole/multi-authored-then-edited ordering (MDC 1.2.3)
+      is implemented using APA 7th's convention for breaking ties
+      among co-authored/co-edited works (by 2nd/3rd/... author).
+    * Contrary to MDC Style, three em-dashes are used when a source has multiple
+      authors or editors, because CSL cannot test for number of authors when substituting
+      the dashes.
   -->
   <info>
     <title>McMaster Divinity College</title>
@@ -78,20 +74,23 @@
        "-note" short-form variants), then the composite "contributors-*"
        macros that assemble a full name list for one context each.
        ========================================================================== -->
-  <!-- SORT KEY ONLY: author (or editor/translator if no author), truncated. Truncation here only
-       affects the string used for alphabetizing, never what gets printed. For what gets output, see contributors-full/-short. -->
-  <macro name="contributors-sort">
+  <!-- PRIMARY SORT KEY: author (or editor/translator if no author), truncated. Truncation here only
+       affects the string used for alphabetizing, never what gets printed. For what gets output, see contributors-full/-short.
+       et-al-min="1" (always truncate to the first name) is deliberate: it clusters all of a
+       given first author's/editor's works together regardless of how many co-authors any one
+       of them has, which the bibliography's sole-vs-multi ordering below depends on. -->
+  <macro name="sort-contributors">
     <names variable="author">
       <name and="text" delimiter-precedes-et-al="after-inverted-name"
-        delimiter-precedes-last="after-inverted-name" et-al-min="3" et-al-use-first="1"
+        delimiter-precedes-last="after-inverted-name" et-al-min="1" et-al-use-first="1"
         initialize="false" initialize-with=". " name-as-sort-order="first"/>
       <substitute>
-        <text macro="editor-sort"/>
-        <text macro="translator-sort"/>
+        <text macro="sort-editors"/>
+        <text macro="sort-translators"/>
       </substitute>
     </names>
   </macro>
-  <macro name="editor-sort">
+  <macro name="sort-editors">
     <names variable="editor">
       <name and="text" delimiter-precedes-et-al="after-inverted-name"
         delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"
@@ -99,7 +98,7 @@
       <label form="short" prefix=", "/>
     </names>
   </macro>
-  <macro name="translator-sort">
+  <macro name="sort-translators">
     <names variable="translator">
       <name and="text" delimiter-precedes-et-al="after-inverted-name"
         delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"
@@ -107,6 +106,49 @@
       <label form="short" prefix=", "/>
     </names>
   </macro>
+  <!-- SECONDARY SORT KEY: the contributor-group key (1/2/3) makes the
+       authored-vs-edited split explicit, since presence of "author" vs "editor" is
+       something <choose><if> can test directly. -->
+  <macro name="sort-contributor-group">
+    <choose>
+      <if variable="author">
+        <text value="1"/>
+      </if>
+      <else-if variable="editor">
+        <text value="2"/>
+      </else-if>
+      <else>
+        <text value="3"/>
+      </else>
+    </choose>
+  </macro>
+  <!-- TERTIARY SORT KEY: The sole-vs-multi split needs no specific test. Instead, this
+       sort-full-names key renders every name untruncated, so a solo work's sort string is
+       always a strict prefix of any co-authored work sharing the same first name (compare
+       "Smith, Jane" against "Smith, Jane and Zebra, Zed") and so always sorts first; ties
+       among co-authored/co-edited works are then broken by the second author's surname,
+       then the third, and so on - the same convention APA 7th uses (Publication Manual,
+       7th ed., p. 305). -->
+  <macro name="sort-full-names">
+    <choose>
+      <if variable="author">
+        <names variable="author">
+          <name and="text" name-as-sort-order="first" initialize="false" initialize-with=". "/>
+        </names>
+      </if>
+      <else-if variable="editor">
+        <names variable="editor">
+          <name and="text" name-as-sort-order="first" initialize="false" initialize-with=". "/>
+        </names>
+      </else-if>
+      <else-if variable="translator">
+        <names variable="translator">
+          <name and="text" name-as-sort-order="first" initialize="false" initialize-with=". "/>
+        </names>
+      </else-if>
+    </choose>
+  </macro>
+  <!-- NAME OUTPUT MACROS -->
   <!-- In bibliographies, every author, editor, and translator gets listed, substituting editor-full/translator-full
        when there is no author (e.g. edited volumes). -->
   <macro name="contributors-full">
@@ -174,8 +216,9 @@
       <name and="text" delimiter=", "/>
     </names>
   </macro>
-  <!-- In a bibliography, some types require secondary contributors to follow the title when an author is also present. For example, "Edited by X. Translated by Y."
-     See MDC 1.2.1.1.4 Books with Editors, Translators, and/or Revisers. -->
+  <!-- In a bibliography, secondary contributors follow the title when a higher-ranking contributor
+    is primary (Author -> Editor -> Translator). For example, an authored book might need to include
+    "Edited by X. Translated by Y." See MDC 1.2.1.1.4 Books with Editors, Translators, and/or Revisers. -->
   <macro name="editor-secondary">
     <choose>
       <if type="paper-conference entry-dictionary chapter entry-encyclopedia" match="none">
@@ -204,7 +247,7 @@
       </if>
     </choose>
   </macro>
-  <!-- The editor/translator credit for the CONTAINING work, when citing a chapter or an
+  <!-- The editor/translator credit for the CONTAINING work appears with its title when citing a chapter or an
        encyclopedia/dictionary entry - MDC 1.2.1.3 Book Chapters, 1.2.1.4 Encyclopedia Entries. -->
   <macro name="container-contributors">
     <choose>
@@ -309,7 +352,7 @@
     </choose>
   </macro>
   <!-- ==========================================================================
-       DESCRIPTION & EVENT
+       SPECIAL SOURCE TYPE DESCRIPTIONS
        ========================================================================== -->
   <!-- Bibliography "genre" line (e.g. "Unpublished lecture", "Class handout") and interviewer
        credit - MDC 1.2.1.7 Unpublished Lectures, 1.2.1.11 Handouts, 1.2.1.20 Interviews. -->
@@ -381,9 +424,9 @@
       <text variable="publisher"/>
     </group>
   </macro>
-  <!-- In general, most details group after the main title. For example, "(Year)" for journals/legal cases;
-       "Genre, Institution, Year" for theses (MDC 1.2.1.6); "City: Publisher, Year" for
-       most other types; date-only for newspapers (MDC 1.2.1.24). -->
+  <!-- In general, most details that locate a source are grouped together after the main title.
+    For example, "(Year)" for journals/legal cases; "Genre, Institution, Year" for theses (MDC 1.2.1.6);
+    "City: Publisher, Year" for most other types; date-only for newspapers (MDC 1.2.1.24). -->
   <macro name="locators">
     <choose>
       <if type="article-journal">
@@ -592,7 +635,7 @@
   <!-- DOI/URL handling at the end of a bibliography entry:
        - no DOI or URL for books, book chapters, theses, or presentations (requires manual fix for online-only resources of these types)
        - webpages/blogs get "Online: URL" (MDC 1.2.1.14)
-       - online-only dictionary/encyclopedia entries with no print page get the same (MDC 1.2.1.5)
+       - online-only dictionary/encyclopedia entries (i.e. those with no typeset page range) get the same (MDC 1.2.1.5)
        - journal articles: DOI only if unpaginated (suggestion online-only); never DOI and URL together (MDC 1.2.1.2.3-4)
        - everything else (books, chapters, etc.): DOI if present, else a plain URL -->
   <macro name="electronic-access">
@@ -607,7 +650,8 @@
             </if>
           </choose>
         </if>
-        <!-- Books, chapters in books, theses, presentations - never include DOI or URL (requires manual fix for online-only books and book chapters; MDC never wants online info for theses) -->
+        <!-- Books, chapters in books, theses, presentations - never include DOI or URL;
+          (requires manual fix for online-only books and book chapters; MDC never wants online info for theses) -->
         <else-if type="book chapter thesis speech"/>
         <!-- Journal articles (MDC 1.2.1.2.3-4) and dictionary/encyclopedia entries (MDC 1.2.1.5):
              no DOI or URL when paginated (requires manual fix for a paginated online-only
@@ -654,7 +698,7 @@
        ========================================================================== -->
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true">
     <sort>
-      <key macro="contributors-sort"/>
+      <key macro="sort-contributors"/>
       <key variable="title"/>
       <key variable="genre"/>
       <key variable="issued"/>
@@ -671,14 +715,17 @@
        BIBLIOGRAPHY
 
        Hanging indent + 3-em-dash subsequent-author-substitute - MDC 1.2 Bibliography,
-       1.2.3 Arranging Entries. Sorted by author/editor, then title, genre, and date.
-       This does not implement MDC 1.2.3's full four-tier sole/multi-author(ed/edited)
-       ordering; see the header note.
+       1.2.3 Arranging Entries. Sorted by author/editor, then sole-before-multi-authored
+       before sole-before-multi-edited (see sort-contributor-group/sort-full-names above),
+       then title, genre, and date. This follows APA 7th's convention for the sole-vs-multi
+       split (ties among co-authored/co-edited works broken by 2nd/3rd/... author).
        ========================================================================== -->
   <bibliography hanging-indent="true" subsequent-author-substitute="&#8212;&#8212;&#8212;"
     entry-spacing="1">
     <sort>
-      <key macro="contributors-sort"/>
+      <key macro="sort-contributors"/>
+      <key macro="sort-contributor-group"/>
+      <key macro="sort-full-names"/>
       <key variable="title"/>
       <key variable="genre"/>
       <key variable="issued"/>
