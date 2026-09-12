@@ -149,7 +149,7 @@
     </choose>
   </macro>
   <!-- NAME OUTPUT MACROS -->
-  <!-- In bibliographies, every author, editor, and translator gets listed, substituting editor-full/translator-full
+  <!-- In bibliographies, every author, editor, and translator gets listed, substituting editors-full/translators-full
        when there is no author (e.g. edited volumes). -->
   <macro name="contributors-full">
     <names variable="author">
@@ -157,19 +157,19 @@
         delimiter-precedes-last="always" initialize="false" initialize-with=". "
         name-as-sort-order="first"/>
       <substitute>
-        <text macro="editor-full"/>
-        <text macro="translator-full"/>
+        <text macro="editors-full"/>
+        <text macro="translators-full"/>
       </substitute>
     </names>
   </macro>
-  <macro name="editor-full">
+  <macro name="editors-full">
     <names variable="editor">
       <name and="text" delimiter-precedes-et-al="after-inverted-name"
         delimiter-precedes-last="always" name-as-sort-order="first"/>
       <label form="short" prefix=", "/>
     </names>
   </macro>
-  <macro name="translator-full">
+  <macro name="translators-full">
     <names variable="translator">
       <name and="text" delimiter-precedes-et-al="after-inverted-name"
         delimiter-precedes-last="always" name-as-sort-order="first"/>
@@ -182,46 +182,47 @@
     <names variable="author">
       <name form="short" and="text" delimiter=", "/>
       <substitute>
-        <text macro="editor-note"/>
-        <text macro="translator-note"/>
+        <text macro="editors-note"/>
+        <text macro="translators-note"/>
       </substitute>
     </names>
-    <text macro="recipient-short"/>
+    <text macro="recipients-short"/>
   </macro>
   <!-- Short-form editor substitute for footnotes, incl. the ", ed." label - MDC 1.2.1.1.7. -->
-  <macro name="editor-note">
+  <macro name="editors-note">
     <names variable="editor">
       <name form="short" and="text"/>
       <label form="short" prefix=", "/>
     </names>
   </macro>
   <!-- Short-form translator substitute for footnotes. -->
-  <macro name="translator-note">
+  <macro name="translators-note">
     <names variable="translator">
       <name form="short" and="text"/>
       <label form="verb-short" prefix=", "/>
     </names>
   </macro>
   <!-- Footnote "to Recipient" for personal_communication (letters, emails) - MDC 1.2.1.20. -->
-  <macro name="recipient-short">
+  <macro name="recipients-short">
     <names variable="recipient">
       <label form="verb" prefix=" " suffix=" "/>
       <name form="short" and="text" delimiter=", "/>
     </names>
   </macro>
   <!-- Bibliography "Interview by X" credit line - MDC 1.2.1.20 Interviews. -->
-  <macro name="interviewer">
+  <macro name="interviewers">
     <names variable="interviewer" delimiter=", ">
       <label form="verb" prefix=" " text-case="capitalize-first" suffix=" "/>
       <name and="text" delimiter=", "/>
     </names>
   </macro>
-  <!-- In a bibliography, secondary contributors follow the title when a higher-ranking contributor
-    is primary (Author -> Editor -> Translator). For example, an authored book might need to include
-    "Edited by X. Translated by Y." See MDC 1.2.1.1.4 Books with Editors, Translators, and/or Revisers. -->
-  <macro name="editor-secondary">
+  <!-- In a bibliography, editor credits follow the title when an author is already the primary
+    contributor. For example, an authored book might need to include "Edited by X."
+    Editors should not be included like this for source types that include them in container info.
+    See MDC 1.2.1.1.4 Books with Editors, Translators, and/or Revisers. -->
+  <macro name="editors-secondary">
     <choose>
-      <if type="paper-conference entry-dictionary chapter entry-encyclopedia" match="none">
+      <if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
         <choose>
           <if variable="author">
             <names variable="editor">
@@ -233,37 +234,23 @@
       </if>
     </choose>
   </macro>
-  <macro name="translator-secondary">
-    <choose>
-      <if type="paper-conference entry-dictionary chapter entry-encyclopedia" match="none">
-        <choose>
-          <if variable="author editor" match="any">
-            <names variable="translator">
-              <label form="verb" text-case="capitalize-first" suffix=" "/>
-              <name and="text" delimiter=","/>
-            </names>
-          </if>
-        </choose>
-      </if>
-    </choose>
+  <!-- In a bibliography, translators follow the main source info and/or the container info.
+    See MDC 1.2.1.1.4 Books with Editors, Translators, and/or Revisers & 1.2.1.2.6 When Citing a Translated Article. -->
+  <macro name="translators">
+    <names variable="translator">
+      <label form="verb" text-case="capitalize-first" suffix=" "/>
+      <name and="text" delimiter=","/>
+    </names>
   </macro>
-  <!-- The editor/translator credit for the CONTAINING work appears with its title when citing a chapter or an
+  <!-- The editor credit for a CONTAINING work appears with its title when citing a chapter or an
        encyclopedia/dictionary entry - MDC 1.2.1.3 Book Chapters, 1.2.1.4 Encyclopedia Entries. -->
   <macro name="container-contributors">
     <choose>
-      <if type="paper-conference entry-dictionary chapter entry-encyclopedia" match="any">
+      <if type="chapter entry-dictionary entry-encyclopedia paper-conference" match="any">
         <group delimiter=", ">
           <choose>
             <if variable="author">
               <names variable="container-author editor" delimiter=", ">
-                <label form="verb" suffix=" "/>
-                <name and="text" delimiter=", "/>
-              </names>
-            </if>
-          </choose>
-          <choose>
-            <if variable="author editor" match="any">
-              <names variable="translator" delimiter=", ">
                 <label form="verb" suffix=" "/>
                 <name and="text" delimiter=", "/>
               </names>
@@ -339,7 +326,6 @@
   <macro name="container-title">
     <choose>
       <if type="chapter paper-conference entry-dictionary entry-encyclopedia">
-        <text term="in" text-case="capitalize-first" suffix=" "/>
         <choose>
           <if type="entry-dictionary entry-encyclopedia">
             <text variable="container-title" form="short" font-style="italic"/>
@@ -363,7 +349,7 @@
       <else>
         <group delimiter=", ">
           <group delimiter=". ">
-            <text macro="interviewer"/>
+            <text macro="interviewers"/>
             <text variable="medium" text-case="capitalize-first"/>
           </group>
           <choose>
@@ -466,14 +452,16 @@
         </group>
       </else-if>
       <else-if type="speech">
-        <group delimiter=", ">
+        <group delimiter=". ">
           <group>
             <text variable="genre" text-case="capitalize-first"/>
             <text term="presented at" prefix=" "/>
             <text variable="event" prefix=" "/>
           </group>
-          <text variable="event-place"/>
-          <text macro="date-of-issue"/>
+          <group delimiter=", ">
+            <text variable="event-place"/>
+            <text macro="date-of-issue"/>
+          </group>
         </group>
       </else-if>
       <else-if type="article-newspaper">
@@ -484,26 +472,22 @@
         <text variable="container-title" prefix=" "/>
         <text variable="page" prefix=" "/>
       </else-if>
+      <else-if type="chapter">
+        <group delimiter=", ">
+          <text macro="publisher-full"/>
+          <text macro="date-of-issue"/>
+        </group>
+      </else-if>
       <else-if variable="publisher-place publisher" match="any">
         <choose>
           <if variable="original-date">
             <!-- Reprint - MDC 1.2.1.1.15 (see Jeremias/Denniston examples): "OriginalYear.
-                 Reprint, City: Publisher, Year." Original publisher/place are shown only if the
-                 item itself has them populated (CMOS 14.119: include them only where relevant). -->
+                 Reprint, City: Publisher, Year." Original publisher/place must be added manually
+                 if they are important (CMOS 14.119: include them only where relevant). -->
             <group delimiter=". ">
-              <group delimiter=", ">
-                <choose>
-                  <if variable="original-publisher original-publisher-place" match="any">
-                    <group delimiter=": ">
-                      <text variable="original-publisher-place"/>
-                      <text variable="original-publisher"/>
-                    </group>
-                  </if>
-                </choose>
-                <date variable="original-date">
-                  <date-part name="year"/>
-                </date>
-              </group>
+              <date variable="original-date">
+                <date-part name="year"/>
+              </date>
               <group delimiter=", " prefix="Reprint, ">
                 <text macro="publisher-full"/>
                 <text macro="date-of-issue"/>
@@ -525,7 +509,7 @@
   </macro>
   <!-- For chapters in books, including conference presentataions, bibliography entries require "volume:page"
     at the end of the container info. - MDC 1.2.1.3.2. -->
-  <macro name="container-locators">
+  <macro name="container-part-locators">
     <choose>
       <if type="chapter paper-conference entry-dictionary entry-encyclopedia">
         <choose>
@@ -562,25 +546,14 @@
     </group>
   </macro>
   <!-- ==========================================================================
-       MULTI-VOLUMES, SERIES, AND EDITIONS
+       MULTIPLE VOLUMES, MULTIPLE EDITIONS, AND MULTIPLE-WORK SERIES
        ========================================================================== -->
   <macro name="multi-volume">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song">
+      <if type="bill book chapter graphic legal_case legislation motion_picture report song">
         <group>
           <number variable="number-of-volumes" form="numeric"/>
           <text term="volume" form="short" prefix=" " plural="true"/>
-        </group>
-      </if>
-    </choose>
-  </macro>
-  <!-- Series name + number - MDC 1.2.6 Abbreviating Book Series and Journal Titles. -->
-  <macro name="series">
-    <choose>
-      <if type="article-journal" match="none">
-        <group>
-          <text variable="collection-title" text-case="title"/>
-          <text variable="collection-number" prefix=" "/>
         </group>
       </if>
     </choose>
@@ -597,9 +570,20 @@
             </group>
           </if>
           <else>
-            <text variable="edition" text-case="capitalize-first"/>
+            <text variable="edition"/>
           </else>
         </choose>
+      </if>
+    </choose>
+  </macro>
+  <!-- Series name + number - MDC 1.2.6 Abbreviating Book Series and Journal Titles. -->
+  <macro name="series">
+    <choose>
+      <if type="article-journal" match="none">
+        <group>
+          <text variable="collection-title" text-case="title"/>
+          <text variable="collection-number" prefix=" "/>
+        </group>
       </if>
     </choose>
   </macro>
@@ -690,6 +674,45 @@
     </choose>
   </macro>
   <!-- ==========================================================================
+       CONTAINERS
+       ========================================================================== -->
+  <!-- When part of a work is cited, the overarching work requires its own treatment. -->
+  <macro name="container">
+    <choose>
+      <if type="chapter entry-dictionary entry-encyclopedia paper-conference">
+        <choose>
+          <!-- Reprints include the original date prior to the container info. See MDC 1.2.1.1.15
+            Reprints. -->
+          <if type="chapter" variable="original-date" match="all">
+            <group delimiter=". ">
+              <date variable="original-date">
+                <date-part name="year"/>
+              </date>
+              <group delimiter=", " prefix="Reprint in ">
+                <text macro="container-title"/>
+                <text macro="container-contributors"/>
+                <text macro="container-part-locators"/>
+              </group>
+            </group>
+          </if>
+          <else>
+            <text term="in" text-case="capitalize-first" suffix=" "/>
+            <group delimiter=", " prefix="">
+              <text macro="container-title"/>
+              <text macro="container-contributors"/>
+              <text macro="container-part-locators"/>
+            </group>
+          </else>
+        </choose>
+      </if>
+      <else-if type="book" variable="volume container-title">
+        <text term="volume" text-case="capitalize-first" form="short" suffix=" "/>
+        <text variable="volume" suffix=" of "/> 
+        <text variable="container-title" text-case="title" font-style="italic"/>
+      </else-if>
+    </choose>
+  </macro>
+  <!-- ==========================================================================
        CITATION (FOOTNOTES)
 
        Always short-form: author short-name, short title, locator; see the header note.
@@ -736,15 +759,11 @@
           <text macro="contributors-full"/>
           <text macro="title"/>
           <text macro="description"/>
-          <text macro="editor-secondary"/>
-          <text macro="translator-secondary"/>
-          <group delimiter=", ">
-            <text macro="container-title"/>
-            <text macro="container-contributors"/>
-            <text macro="container-locators"/>
-          </group>
-          <text macro="edition"/>
+          <text macro="container"/>
+          <text macro="editors-secondary"/>
+          <text macro="translators"/>
           <text macro="multi-volume"/>
+          <text macro="edition"/>
           <text macro="series"/>
           <text macro="locators"/>
           <text macro="pagination-check"/>
