@@ -6,6 +6,11 @@ Date: September 18, 2026
 
 This guide explains how to enter source data in Zotero so that citations and bibliographies generated using the MDC CSL style conform as closely as possible to the *MDC Press Style Guide*.
 
+# Known Issues
+
+At present, Zotero cannot sort titles in a bibliography by ignoring initial articles (e.g. The,
+An, etc.). There is a user-developed plugin that overcomes this limitation, but no timeline on an official solution.
+
 # The "Extra" Field
 
 Most of the supplied Zotero item types supply users with specific, named fields for relevant information, but there is also an **Extra** field. This special field allows users to achieve citations and bibliographic entries that are not possible using Zotero's built-in fields.
@@ -20,9 +25,13 @@ Date: 1991
 
 should be interpreted to mean, "Enter everything after the colon into Zotero's **Date** field."
 
-Zotero's **Extra** field is an important exception to this, because the field allows users to explicitly define what is being entered. This is done by typing an appropriate prefix followed by a colon.
+Zotero's **Extra** field is an important exception to this, because the field allows users to
+explicitly define what is being entered. This is done by typing an appropriate variable name, a
+colon, a space, and then the desired value. If you need to include multiple variables, place each
+one on a separate line.
 
-For instance, you can force Zotero to include two titles for a book, if a titled book appears in a titled multi-volume series. Simply enter the following in the **Extra** field:
+For instance, if a titled book appears in a titled multi-volume series, you can enable Zotero to
+handle both titles. Simply enter the following in the **Extra** field:
 
 ```text
 container-title: Old Testament Theology
@@ -50,7 +59,8 @@ Whereas,
 issued: "1991–1995"
 ```
 
-means, "Enter `issued: "1991–1995"` in Zotero's **Extra** field, including the prefix, the colon, and the quotation marks.
+means, "Enter `issued: "1991–1995"` in Zotero's **Extra** field, including the prefix, the colon,
+the space, and the quotation marks.
 
 ## Annotations
 
@@ -112,6 +122,36 @@ First Name: Dale C., Jr.
 Last Name: Allison
 ```
 
+### Particles in Names
+
+If a particle (e.g. van, van der, von, de, de la, du, etc.) should not appear in a footnote, include it in lowercase
+within the **first name** field as though it were a middle name.
+
+```text
+First Name: Ludwig van
+Last Name: Beethoven
+(This will appear as "Beethoven" in footnotes and "Beethoven, Ludwig van" in bibliographies.)
+```
+
+If a particle should appear in lowercase before a last name in footnotes, but function like a middle
+name in bibliographies, include it in lowercase within the **last name** field. Note that Zotero
+cannot automatically capitalize these particles for you, so you may need to manually fix some of these (e.g. change "de la Fontaine" to "de La Fontaine").
+
+```text
+First Name: Gerhard
+Last Name: von Rad
+(This will appear as "von Rad" in footnotes but "Rad, Gerhard von" in bibliographies.)
+```
+
+If you capitalize a particle in the **last name** field, it will be treated as part of the last name and will sort accordingly (e.g.
+Van der Toorn will sort under 'V').
+
+```text
+First Name: John
+Last Name: Van Seters
+(This will appear as "Van Seters" in footnotes and "Van Seters, John" in bibliographies.)
+```
+
 ### Selecting a Contributor Role
 
 The role played by a named contributor is set using a dropdown menu in Zotero. For example, click on "Author" and change it to "Editor". The available roles will change depending on the item type (e.g. "Director" and "Producer" become available for films).
@@ -127,6 +167,38 @@ Include additional contributors by clicking the “+” button next to the initi
 Zotero will automatically use em-dashes in place of contributor names for subsequent entries in a bibliography, if they are by the same author(s) or editor(s). However, in order for this to work the names must be *exactly* the same. Enter a consistent form of each person's name across all Zotero records. Ideally, use the form most commonly used by the author in scholarly publications.
 
 ## Titles
+
+Zotero recommends storing all titles in sentence case, with capitals used only for proper nouns and
+acronyms (or in non-English titles). To quickly clean up the capitalization of a title field, click the three dots to the right of the
+field and select "sentence case." Then, manually capitalize words as needed. This allows Zotero to
+retain sentence case for styles that require this as well as to produce title case for styles that
+require this.
+
+### Capitalization of Titles
+
+Zotero tries to produce title case. However, does this only by capitalizing initial words and words that are
+not exceptions (e.g. articles, brief prepositions, etc.). It will not change any word in your title field that *already* has a capital letter anywhere within it.
+
+## Foreign Titles or Foreign Words in Titles
+
+If your entire source (both part and container) is in a foreign language, adding an ISO code to the language field will prevent Zotero from trying to auto-capitalize
+its title(s). Commonly used codes include: en (English), de (German), fr (French), es (Spanish), it
+(Italian), ko (Korean), zh (Chinese), nl (Dutch), he (Hebrew).
+
+If only certain foreign words are included in an English title, put `<span
+class="nocase">` before any foreign word(s) within an English title, then put `</span>` after the
+relevant word(s).
+
+For example:
+
+```text
+Title: luther's doctrine of <span class="nocase"><i>sola fide</i></span>
+```
+
+Zotero will output this correctly as "Luther's Doctrine of *sola fide*."
+
+This same mechanism can be used for an entire title as well, if a chapter in a foreign language appears in an
+English book.
 
 ### Quotes in Titles
 
@@ -153,41 +225,13 @@ Title: The ‘Exegetical Logic’ of Daniel 9.1–27 (with en-dash)
 
 Put `<i>` before a word to toggle the use of italics, and `</i>` following the last relevant word. This is useful when foreign words appear in a title, or when a title includes another title.
 
-### Capitalization of Titles
-
-Zotero will automatically produce title case for titles. Because foreign words in titles do not follow English capitalization rules, put `<span class="nocase">` before any foreign title or before any foreign word(s) within a title, then put `</span>` after the relevant word(s).
-
-For example:
-
-```text
-Title: luther's doctrine of <span class="nocase"><i>sola fide</i></span>
-```
-
-Zotero will output this correctly as "Luther's Doctrine of *sola fide*."
-
-### Short Titles
-
-MDC will look for a short title when one is required, then fall back to a full title if it finds an empty field.
-
-Zotero will *not* automatically fix short titles. To produce MDC style, you must manually remove initial articles (e.g. "A," "The") and then manually shorten whatever remains, producing a brief substantive short title (usually, everything up to the first noun).
-
-```text
-Title: Remarks on Nominalization
-Short Title: Remarks
-```
-
-```text
-Title: The Prestige Language of Christianity in the Book of Acts: Historical Sociolinguistic Approaches to Multilingualism
-Short Title: Prestige Language
-```
-
-### Abbreviated Titles
+### Abbreviations as Titles
 
 Several fields allow for abbreviated titles to be used in bibliographic entries.
 
 Such abbreviations must follow standard conventions (e.g. SBL Handbook of Style).
 
-If a bibliography is part of a thesis, dissertation, or published monograph, its abbreviations must appear in a List of Abbreviations.
+If a bibliography is part of a thesis, dissertation, or published monograph, these abbreviations must appear in a List of Abbreviations.
 
 Abbreviated titles will *not* auto-capitalize, so you must enter abbreviations exactly as they should appear.
 
@@ -209,6 +253,22 @@ For certain source types, a short title must be entered using an appropriate pre
 ```text
 container-title-short: ABD (for a dictionary or encyclopedia)
 collection-title-short: JSNTSup (for a monograph series)
+```
+
+### Short Titles for Footnotes
+
+MDC will look for a short title when one is required, then fall back to a full title if it finds an empty field.
+
+Zotero will *not* automatically fix short titles. To produce MDC style, you must manually remove initial articles (e.g. "A," "The") and then manually shorten whatever remains, producing a brief substantive short title (usually, everything up to the first noun).
+
+```text
+Title: Remarks on Nominalization
+Short Title: Remarks
+```
+
+```text
+Title: The Prestige Language of Christianity in the Book of Acts: Historical Sociolinguistic Approaches to Multilingualism
+Short Title: Prestige Language
 ```
 
 ## Multi-Volume Works
@@ -265,6 +325,14 @@ Publisher: Eerdmans
 ### Format
 
 Zotero recommends ISO date formats (YYYY or YYYY-MM or YYYY-MM-DD).
+
+Most source types will include only a year. If one of these types for some reason requires a month or season, you will
+need to use the **Extra** field to override the normal date handling. Use quotation marks and enter the
+exact output you require.
+
+```text
+issued: "Winter 1876"   
+```
 
 ### Ranges
 
@@ -528,8 +596,9 @@ Be sure to include values in the following fields:
 
 ```text
 Author:
-Meeting Name:
-Place:
+Title:
+Conference Name:
+Event Place:
 Date:
 ```
 
@@ -540,6 +609,7 @@ Use this type for oral presentations outside of formal society meetings. The **T
 For example:
 
 ```text
+Type: seminar presentation
 Type: sermon
 Type: lecture
 ```
@@ -615,7 +685,7 @@ Format: TV series
 Format: Netflix show
 ```
 
-As with podcasts, Zotero will handle individual episodes differently than entire shows. If you cite an individual titled episode, be sure to include the overall series details in:
+As with podcasts, Zotero will handle individual episodes differently than entire shows. If you cite an individual titled episode, be sure to include the overall series details:
 
 ```text
 Title: Episode title goes here
@@ -687,6 +757,14 @@ INCORRECT:
 134-76 (hyphen rather than en-dash)
 ```
 
+If your Zotero item is a multi-volume set, you need to specify which volume is being cited. When supplying pages using the Word plugin, include the volume number, followed by a colon, followed by a correctly-formatted page range:
+
+```text
+1:134-76
+```
+
+If your Zotero item is a single volume that already has a number in the **Volume** field, do *not* redundantly specify the volume number when producing a footnote citation.
+
 ## Parenthetical Citations
 
 When a citation supports something stated in a footnote, it must appear in parentheses within the footnote. It is best to use your word processor for the parentheses, leaving Zotero to handle only what goes inside them.
@@ -720,4 +798,3 @@ Before citing, verify:
 - Publisher name has been manually corrected.
 - Both original and reprint publication dates have been supplied (if relevant).
 - Edition statements match the source exactly.
-- Kindle books use `Format: Kindle edition`.

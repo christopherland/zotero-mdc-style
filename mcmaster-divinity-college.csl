@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <style class="note" version="1.0" and="text" initialize="false" initialize-with=". "
-  page-range-format="chicago" demote-non-dropping-particle="sort-only" default-locale="en-US"
+  page-range-format="chicago" demote-non-dropping-particle="display-and-sort" default-locale="en-US"
   xmlns="http://purl.org/net/xbiblio/csl">
   <!-- McMaster Divinity College Press style. Implements the notes-and-bibliography citation
        system described in the McMaster Divinity College Press Style Guide (MDC), Version
@@ -84,13 +84,13 @@
       <substitute>
         <names variable="editor">
           <name and="text" delimiter-precedes-et-al="after-inverted-name"
-            delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"
+            delimiter-precedes-last="after-inverted-name" et-al-min="1" et-al-use-first="1"
             name-as-sort-order="first"/>
           <label form="short" prefix=", "/>
           <substitute>
             <names variable="translator">
               <name and="text" delimiter-precedes-et-al="after-inverted-name"
-                delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"
+                delimiter-precedes-last="after-inverted-name" et-al-min="1" et-al-use-first="1"
                 name-as-sort-order="first"/>
               <label form="short" prefix=", "/>
             </names>
@@ -223,7 +223,7 @@
       <if type="chapter entry-dictionary entry-encyclopedia" variable="author">
         <names variable="editor" delimiter=", ">
           <label form="verb" suffix=" "/>
-          <name and="text" delimiter=", " et-al-min="3" et-al-use-first="1"/>
+          <name and="text" delimiter=", "/>
         </names>
       </if>
     </choose>
@@ -356,7 +356,7 @@
       </else-if>
       <else-if variable="reviewed-author">
         <group delimiter=", ">
-          <text variable="title" font-style="italic" prefix="Review of "/>
+          <text variable="title" text-case="title" font-style="italic" prefix="Review of "/>
           <names variable="reviewed-author">
             <label form="verb-short" text-case="lowercase" suffix=" "/>
             <name and="text" delimiter=", "/>
@@ -375,7 +375,7 @@
   <macro name="container-title">
     <choose>
       <if type="article-journal entry-dictionary entry-encyclopedia">
-        <text variable="container-title" form="short" font-style="italic"/>
+        <text variable="container-title" form="short" text-case="title" font-style="italic"/>
       </if>
       <else-if type="chapter article-magazine article-newspaper webpage post-weblog broadcast">
         <text variable="container-title" text-case="title" font-style="italic"/>
@@ -513,14 +513,11 @@
     <choose>
       <if variable="issued">
         <choose>
-          <if type="article-journal">
+          <if type="article-journal book chapter entry-dictionary entry-encyclopedia thesis graphic report">
             <date date-parts="year" form="text" variable="issued"/>
-          </if>
+          </if>         
           <else-if type="paper-conference">
             <date date-parts="year-month-day" form="text" variable="issued"/>
-          </else-if>
-          <else-if type="graphic report">
-            <date date-parts="year" form="text" variable="issued"/>
           </else-if>
           <else-if type="legal_case">
             <text variable="authority" suffix=" "/>
@@ -554,6 +551,7 @@
     <choose>
       <!-- Some source types include container-part locators with the container info. -->
       <if type="article-journal article-magazine article-newspaper post-weblog webpage"/>
+      <else-if type="entry-dictionary entry-encyclopedia" variable="container-title-short"/>
       <else-if type="chapter">
         <group delimiter=", ">
           <text macro="publisher-full"/>
@@ -660,7 +658,7 @@
     <choose>
       <if type="article-journal broadcast motion_picture" match="none">
         <group>
-          <text variable="collection-title" form="short"/>
+          <text variable="collection-title" form="short" text-case="title"/>
           <text variable="collection-number" prefix=" "/>
         </group>
       </if>
@@ -819,12 +817,22 @@
           </if>
           <else>
             <text term="in" text-case="capitalize-first" suffix=" "/>
-            <group delimiter=", ">
-              <text macro="container-authors"/>
-              <text macro="container-title"/>
-              <text macro="container-editors"/>
-              <text macro="container-part-locators"/>
-            </group>
+            <choose>
+              <if variable="container-title-short">
+                <group delimiter=" ">
+                  <text macro="container-title"/>
+                  <text macro="container-part-locators"/>
+                </group>
+              </if>
+              <else>
+                <group delimiter=", ">
+                  <text macro="container-authors"/>
+                  <text macro="container-title"/>
+                  <text macro="container-editors"/>
+                  <text macro="container-part-locators"/>
+                </group>
+              </else>
+            </choose>
           </else>
         </choose>
       </else-if>
@@ -871,7 +879,7 @@
   <!-- ==========================================================================
        CITATION (FOOTNOTES)
 
-       Always short-form: author short-name, short title, locator; see the header note.
+       Always short-form: author short-name (including relevant particles), short title, locator; see the header note.
        et-al-min/et-al-use-first here (not on bibliography) is what makes footnotes truncate to
        "et al." after 3+ authors while the bibliography lists everyone.
        ========================================================================= -->
@@ -896,7 +904,7 @@
             <text macro="translators-short"/>
             <choose>
               <if variable="collection-title">
-                <text variable="collection-title" form="short"/>
+                <text variable="collection-title" form="short" text-case="title"/>
               </if>
               <else>
                 <text macro="title-short"/>
